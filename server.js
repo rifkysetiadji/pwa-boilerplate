@@ -5,27 +5,30 @@ const { parse } = require("url");
 const next = require("next");
 const fetch = require("isomorphic-unfetch")
 const LRUCache = require('lru-cache')
-
-const port = parseInt(process.env.PORT, 10) || 3000;
+var proxy = require('http-proxy-middleware');
+const port = parseInt(process.env.PORT, 10) || 4000;
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
 const handle = app.getRequestHandler();
 const apicache = require("apicache") 
 
 const server = express();
-
+server.use(
+  '/api',
+  proxy({ target: 'http://localhost:8000', changeOrigin: true })
+);
 let cache = apicache.middleware
 
 const API_URL = `https://jsonplaceholder.typicode.com/todos`
 
-server.get('/api/todos',  cors(), cache('60 minutes'), (req, res) => {
-  fetch(API_URL)
-  .then( r => r.json() )
-  .then( data => {
-    res.json(data)
-  });
-  console.log("API SERVED..")
-});
+// server.get('/api/todos',  cors(), cache('60 minutes'), (req, res) => {
+//   fetch(API_URL)
+//   .then( r => r.json() )
+//   .then( data => {
+//     res.json(data)
+//   });
+//   console.log("API SERVED..")
+// });
 
 // This is where we cache our rendered HTML pages
 const ssrCache = new LRUCache({
@@ -39,11 +42,11 @@ app
     server.get('/', (req, res) => {
       renderAndCache(req, res, '/')
     })
-    server.get("/todos/:id", (req, res) => {
-      const actualPage = "/todos";
-      const queryParams = { title: req.params.title };
-      renderAndCache(req, res, actualPage, queryParams);
-    });
+    // server.get("/todos/:id", (req, res) => {
+    //   const actualPage = "/todos";
+    //   const queryParams = { title: req.params.title };
+    //   renderAndCache(req, res, actualPage, queryParams);
+    // });
    
     server.get("*", (req, res) => {
       const parsedUrl = parse(req.url, true);
@@ -57,9 +60,9 @@ app
       }
     });
 
-    server.listen(3000, err => {
+    server.listen(4000, err => {
       if (err) throw err;
-      console.log("> Ready on http://localhost:3000");
+      console.log("> Ready on http://localhost:4000");
     });
   })
   .catch(ex => {

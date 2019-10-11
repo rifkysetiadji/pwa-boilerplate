@@ -1,0 +1,11 @@
+.textarea-thread{
+    border:1px solid black;
+    border-radius: 5px;
+    width: 300px;
+    /* height: 40px; */
+    font-size: 15px;
+    padding: 10px;
+}
+.textarea-thread:focus{
+    outline: none
+}

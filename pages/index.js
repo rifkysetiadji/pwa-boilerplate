@@ -1,19 +1,31 @@
 
 import React, { Component } from 'react'
-import Head from 'next/head'
-import Nav from '../components/nav'
 import './style.css'
-export default class index extends Component {
- 
+import {Button} from 'reactstrap'
+import Auth from './auth'
+import Cookie from 'universal-cookie'
+const cookies=new Cookie()
+import Router, { useRouter, withRouter } from "next/router";
+class index extends Component {
+  
+  componentDidMount(){
+    let token=cookies.get('tokenCookie')
+    if(token==undefined){
+      Router.push({
+        pathname: "/auth",
+        query: { act: 'login' }
+      })
+    }else{
+      window.location.assign('/home')
+    }
+    
+  }
   render() {
+    
     return (
-      <div>
-         <Head>
-      <title>Home</title>
-    </Head>
-
-      <p className="test">hallo</p>
-      </div>
+      <div></div>
+      
     )
   }
 }
+export default withRouter(index)
