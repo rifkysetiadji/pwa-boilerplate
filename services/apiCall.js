@@ -28,11 +28,12 @@ export const apiCall = ({ method, url, data = "" }) => async (dispatch) => {
 		// console.log('from apical',head)
 		return response;
 	} catch (error) {
-		if(get(response,'status')==401){
-			dispatch(logoutSubmit())
-		}else{
-			console.log(error)
 
+		if(get(error.response,'status')==401){
+			await dispatch(logoutSubmit())
+		}else if(get(error.response,'status')==404){
+			//  alert('404')
+			window.location.assign('/404')
 		}
 		
 

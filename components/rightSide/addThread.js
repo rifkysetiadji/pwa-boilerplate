@@ -9,6 +9,7 @@ import {Button} from 'reactstrap'
 import FileCopyIcon from '@material-ui/icons/FileCopy';
 import {addThread} from '../../redux/actions/thread'
 import {connect} from 'react-redux'
+import {Spinner} from 'reactstrap'
 class addThreads extends Component {
     state={
         caption:''
@@ -25,13 +26,13 @@ class addThreads extends Component {
            <Card>
                <CardContent>
                     <h3>Tulis Thread</h3>
-                    <Textarea minRows={3} onChange={(e)=>{this.setState({caption:e.target.value})}} className="textarea-thread"/>
+                    <Textarea minRows={2} placeholder="Lorem ipsum" onChange={(e)=>{this.setState({caption:e.target.value})}} className="textarea-thread"/>
                     
                    
                    
                </CardContent>
                <CardActions disableSpacing>
-               <Button color="dark" onClick={this.onPublish}>Publish</Button>&nbsp;&nbsp;
+               <Button color="dark" onClick={this.onPublish}>{this.props.loading.addThread?<Spinner size="sm"/>:'Posting'}</Button>&nbsp;&nbsp;
                <div className="image-upload" >
                     <label  style={{cursor:'pointer'}}>
                         <FileCopyIcon/>
@@ -45,7 +46,8 @@ class addThreads extends Component {
 }
 const mapStateToProps=(state)=>{
     return{
-        auth:state.auth
+        auth:state.auth,
+        loading:state.loading
     }
 }
 const mapDispatchToProps={

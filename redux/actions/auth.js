@@ -90,9 +90,9 @@ export const getMyProfile=(token)=>{
                 }
             }
         }
-        let res=await dispatch(apiCall(dataReq))
+        const res=await dispatch(apiCall(dataReq))
         if(get(res, 'status') === 200){
-            // console.log(res.data)
+            console.log(res.data)
             let dataUser={
                 id:res.data.user._id,
                 name:res.data.user.name,
@@ -112,7 +112,9 @@ export const getMyProfile=(token)=>{
 
         }else{
             dispatch(setLoading(false,'getMyProfileLoading'))
-            console.log(res)
+            // console.log(res)
+            // alert('error')
+            return res
         }
     }
 }
@@ -130,8 +132,10 @@ export const getProfile=(token,id)=>{
         }
         let res=await dispatch(apiCall(dataReq))
         if(get(res, 'status') === 200){
+            console.log('res.data', res.data)
             let dataUser={
                 id:res.data.user._id,
+                avatar_url:res.data.user.avatar_url,
                 name:res.data.user.name,
                 email:res.data.user.email,
                 threadsCount:res.data.user.threads.length,

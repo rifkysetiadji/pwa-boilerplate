@@ -17,10 +17,13 @@ import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ChatBubbleIcon from '@material-ui/icons/ChatBubble';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faComment,faHeart,faPaperPlane } from '@fortawesome/free-solid-svg-icons'
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter ,Spinner} from 'reactstrap';
 import Collapse from '@material-ui/core/Collapse';
 import Textarea from 'react-textarea-autosize';
-export default class index extends Component {
+import {connect} from 'react-redux'
+import {getTimeline} from '../../redux/actions/thread'
+import moment from 'moment'
+class index extends Component {
     state={
         modal:false,
         comment:false
@@ -30,25 +33,26 @@ export default class index extends Component {
           modal: !prevState.modal
         }));
       }
-      commentToggle=()=>{
-        this.setState(prevState => ({
-            comment: !prevState.comment
-          }));
+      commentToggle=(id)=>{
+        this.setState({
+            [id]: !this.state[id]
+          });
       }
-    render() {
-        return (
-            <div>
-                <Modal isOpen={this.state.modal} fade={false} toggle={this.toggle} className={this.props.className}>
-                <ModalHeader toggle={this.toggle}></ModalHeader>
-                <ModalBody>
-
-                </ModalBody>
-                <ModalFooter>
-                    <Button color="primary" onClick={this.toggle}>Do Something</Button>{' '}
-                    <Button color="secondary" onClick={this.toggle}>Cancel</Button>
-                </ModalFooter>
-                </Modal>
-                <Card >
+      componentDidMount(){
+        this.props.getTimeline(this.props.token.token)
+      }
+      renderthread=()=>{
+          if(this.props.loading.getTimeline ){
+              console.log('loading')
+            return(
+                <Spinner color="black"/>
+            )
+          }else{
+              if(this.props.thread.timeline!==null){
+                  let thread=this.props.thread.timeline.map(res=>{
+                      return(
+                          <div>
+                    <Card >
                 <CardHeader
                     avatar={
                     <Avatar aria-label="recipe" >
@@ -60,8 +64,8 @@ export default class index extends Component {
                         <MoreVertIcon />
                     </IconButton>
                     }
-                    title="Shrimp and Chorizo Paella"
-                    subheader="September 14, 2016"
+                    title={res.user_id.name}
+                    subheader={moment(res.created_at).format('DD MMM YYYY')}
                 />
                 {/* <CardMedia
                     image="/static/images/cards/paella.jpg"
@@ -69,11 +73,10 @@ export default class index extends Component {
                 /> */}
                 <CardContent>
                     <Typography variant="body2" color="textSecondary" component="p">
-                    This impressive paella is a perfect party dish and a fun meal to cook together with your
-                    guests. Add 1 cup of frozen peas along with the mussels, if you like.
+                    {res.caption}
                     </Typography>
                 </CardContent>
-                <Collapse in={this.state.comment} timeout="auto" unmountOnExit>
+                <Collapse in={this.state[res._id]} timeout="auto" unmountOnExit>
                 <CardContent>
                     <Row>
                         <Col md={10}>
@@ -92,14 +95,46 @@ export default class index extends Component {
                     <IconButton aria-label="share">
                         <FontAwesomeIcon icon={faHeart} />
                     </IconButton>
-                    <IconButton aria-label="share" onClick={this.commentToggle}>
+                    <IconButton aria-label="share" onClick={()=>this.commentToggle(res._id)}>
                         <FontAwesomeIcon icon={faComment} />
                     </IconButton>
                 
                 </CardActions>
                 
                 </Card>
+                <br/>
+                </div>
+                )
+                  })
+                  return thread
+              }
+          }
+      }
+    render() {
+        return (
+            <div>
+                <Modal isOpen={this.state.modal} fade={false} toggle={this.toggle} className={this.props.className}>
+                <ModalHeader toggle={this.toggle}></ModalHeader>
+                <ModalBody>
+
+                </ModalBody>
+                <ModalFooter>
+                    <Button color="primary" onClick={this.toggle}>Do Something</Button>{' '}
+                    <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+                </ModalFooter>
+                </Modal>
+                {this.renderthread()}
             </div>
         )
     }
 }
+const mapStateToProps=(state)=>{
+    return{
+        thread:state.thread,
+        loading:state.loading
+    }
+}
+const mapDispatchToProps={
+    getTimeline
+}
+export default connect(mapStateToProps,mapDispatchToProps)(index)

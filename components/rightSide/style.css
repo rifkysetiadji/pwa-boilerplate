@@ -1,6 +1,7 @@
 .textarea-thread{
-    border:1px solid black;
-    border-radius: 5px;
+    border: 0;
+    /* border:1px solid black; */
+    /* border-radius: px; */
     width: 300px;
     /* height: 40px; */
     font-size: 15px;

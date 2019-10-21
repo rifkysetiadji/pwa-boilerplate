@@ -1,0 +1,25 @@
+.img-profile{
+    /* background-image: url('/static/img/avadefault.png')!important; */
+    width: 100px;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    border-radius: 5px;
+    height: 100%;
+    cursor: pointer;
+}
+.text-edit{
+    text-align: center;
+    line-height: 100px;
+    visibility: hidden
+}
+.img-profile:hover .text-edit{
+    /* background-image: url('/static/img/edit-profile.png')!important; */
+    color: white;
+    background-size: 200px;
+    border-radius: 5px;
+    height: 100%;
+    visibility: visible;
+    background: linear-gradient(
+        rgba(20,20,20, .5), 
+        rgba(20,20,20, .5));
+}

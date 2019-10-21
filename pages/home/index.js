@@ -39,7 +39,7 @@ class index extends Component {
                         <Leftside token={token}/>
                     </Col>
                     <Col md={5} >
-                        <Thread/>
+                        <Thread token={token}/>
                     </Col>
                     <Col md={4} >
                         <RightSide token={token}/>
