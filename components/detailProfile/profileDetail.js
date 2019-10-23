@@ -1,17 +1,22 @@
 import React, { Component } from 'react'
 import {Row,Col,Button,Modal, ModalHeader, ModalBody, ModalFooter,} from 'reactstrap'
 import {connect} from 'react-redux'
-import {getProfile,follow,unFollow} from '../../redux/actions/auth'
+import {getProfile,follow,unFollow,uploadAva,updateProfile} from '../../redux/actions/auth'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {faEdit} from '@fortawesome/free-solid-svg-icons'
 import {debounce} from 'lodash'
 import './style.css'
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
+import Cropper from 'react-cropper';
+import 'cropperjs/dist/cropper.css'; 
+import {getFollower,getFollowing}  from '../../redux/actions/search'
+import ModalsFollowers from '../modals/modalFollowers'
+import ModalsFollowing from '../modals/modalFollowing'
+const cropper = React.createRef();
 class profileDetail extends Component {
     state={
         showEdit:false,
-        email:this.props.auth.profile.email,
         name:this.props.auth.profile.name,
         image:null,
         modal:false,
@@ -21,7 +26,18 @@ class profileDetail extends Component {
         crop:{
             aspect:16 / 9 
 
-        }
+        },
+        showFollowers:false,
+        showFollowing:false,
+    }
+    showFollowers=async()=>{
+        this.props.getFollower(this.props.token.token,this.props.auth.profile.id)
+        this.setState({showFollowers:!this.state.showFollowers})
+        
+    }
+    showFollowing=()=>{
+        this.props.getFollowing(this.props.token.token,this.props.auth.profile.id)
+        this.setState({showFollowing:!this.state.showFollowing})
     }
     toggleEdit=()=>{
         this.setState({
@@ -116,7 +132,8 @@ class profileDetail extends Component {
           crop.width,
           crop.height
         );
-    
+        // let image_crop=canvas.toDataURL("image/png")
+        // return image_crop
         return new Promise((resolve, reject) => {
           canvas.toBlob(blob => {
             if (!blob) {
@@ -124,30 +141,38 @@ class profileDetail extends Component {
               console.error("Canvas is empty");
               return;
             }
-            blob.name = fileName;
-            window.URL.revokeObjectURL(this.fileUrl);
-            this.fileUrl = URL.createObjectURL(blob);
-            resolve(this.fileUrl);
+            console.log('canvas', blob)
+            resolve(blob)
+            // blob.name = fileName;
+            // window.URL.revokeObjectURL(this.fileUrl);
+            // this.fileUrl = URL.createObjectURL(blob);
+            // resolve(this.fileUrl);
           }, "image/jpeg");
+       
         });
       }
-      updateAva=()=>{
+       updateAva=()=>{
         this.toggleFoto()
-        console.log('object', this.state.croppedImageUrl)
+        let fd = new FormData()
+        fd.append('img_url', this.state.croppedImageUrl!==null?this.state.croppedImageUrl:this.state.image)
+        this.props.uploadAva(this.props.token.token,fd)
+      }
+      updateProfile=()=>{
+          let data={
+              name:this.state.name
+          }
+          this.props.updateProfile(this.props.token.token,data)
       }
     render() {
         let profile=this.props.auth.profile
         return (
             <div>
+                 {this.state.showFollowers?<ModalsFollowers  isOpen={this.state.showFollowers} toggle={this.showFollowers} />:null}
+                 {this.state.showFollowing?<ModalsFollowing   isOpen={this.state.showFollowing} toggle={this.showFollowing}/>:null}
                  <Modal isOpen={this.state.modal} toggle={this.toggleFoto} fade={false} className={this.props.className} size="lg" >
                      <ModalHeader>Edit avatar</ModalHeader>
                      <ModalBody>
-                         {/* <img src={this.state.image_url} style={{width:'100%'}}/> */}
                          <ReactCrop onImageLoaded={this.onImageLoaded} src={this.state.image_url} crop={this.state.crop} onChange={(newCrop)=>this.setCorp(newCrop)}  onComplete={this.onCropComplete} />
-                         {/* {this.state.croppedImageUrl && (
-                            <img alt="Crop" style={{ maxWidth: "100%" }} src={this.state.croppedImageUrl} />
-                        )} */}
-                        
                         <ModalFooter><Button color="dark" onClick={this.updateAva}>Update</Button></ModalFooter>
                      </ModalBody>
                  </Modal>
@@ -155,7 +180,7 @@ class profileDetail extends Component {
                 <Col md={3} >
                     {profile.self?
                         <label>
-                        <div className="img-profile" style={{backgroundImage:this.state.croppedImageUrl!==null?`url(${this.state.croppedImageUrl})`:"url('/static/img/avadefault.png')"}}>
+                        <div className="img-profile" style={{backgroundImage:profile.avatar_url!==null?`url(${profile.avatar_url})`:"url('/static/img/avadefault.png')"}}>
                             <p className="text-edit">Edit</p>
                         </div>
                         <input id="file-input" onChange={this.onChangeImage} type="file" style={{display:'none'}}/>
@@ -166,18 +191,14 @@ class profileDetail extends Component {
                 </Col>
                 <Col md={9} >
                     <h2>{profile.name}&nbsp;&nbsp;<span>{profile.self?<Button color="dark" onClick={this.toggleEdit}><FontAwesomeIcon icon={faEdit} /></Button>:this.followUnFollowEngine()}</span></h2>
-                    <p>{profile.followersCount} pengikut&nbsp;&nbsp;{profile.followingCount} mengikuti&nbsp;&nbsp;{profile.threadsCount} thread</p><br/>
+                    <p><span style={{cursor:'pointer'}} onClick={this.showFollowers}>{profile.followersCount} pengikut</span>&nbsp;&nbsp;<span onClick={this.showFollowing} style={{cursor:'pointer'}}>{profile.followingCount} mengikuti</span>&nbsp;&nbsp;{profile.threadsCount} thread</p><br/>
                     {this.state.showEdit==true?
                         <>
                         <div>
                             <label>Nama</label>&nbsp;&nbsp;&nbsp;
                             <input type="text" onChange={(e)=>this.setState({name:e.target.value})} value={this.state.name}/>
                         </div>
-                        <div>
-                            <label>Email</label>&nbsp;&nbsp;&nbsp;&nbsp;
-                            <input type="email" onKeyUp={(e)=>console.log(e.target.value)} onChange={(e)=>this.onChange(e.target.value)} value={this.state.email}/>
-                        </div>
-                        <Button color="dark">UPDATE</Button>
+                        <Button color="dark" onClick={this.updateProfile}>UPDATE</Button>
                         </>
                     :null}
                     
@@ -196,6 +217,10 @@ const mapStateToProps=(state)=>{
 const mapDispatchToProps={
     getProfile,
     follow,
-    unFollow
+    unFollow,
+    uploadAva,
+    getFollower,
+    getFollowing,
+    updateProfile
 }
 export default connect(mapStateToProps,mapDispatchToProps)(profileDetail)

@@ -29,11 +29,11 @@ export const searchUser=(keyword,token)=>{
     }
 }
 
-export const getFollower=(token)=>{
+export const getFollower=(token,id)=>{
     return async(dispatch)=>{
         dispatch(setLoading(true,'getFollowersLoading'))
         let dataReq={
-            url:`/auth/followers`,
+            url:`/auth/followers/${id}`,
             method:'GET',
             data:{
                 headers:{
@@ -54,11 +54,11 @@ export const getFollower=(token)=>{
         }
     }
 }
-export const getFollowing=(token)=>{
+export const getFollowing=(token,id)=>{
     return async(dispatch)=>{
         dispatch(setLoading(true,'getFollowingLoading'))
         let dataReq={
-            url:`/auth/following`,
+            url:`/auth/following/${id}`,
             method:'GET',
             data:{
                 headers:{

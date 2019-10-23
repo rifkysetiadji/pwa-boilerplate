@@ -21,7 +21,7 @@ class nav extends Component {
         {this.props.loading.searchLoading?<Spinner color="dark" />
         :this.props.search.result.map(user=>(
           <div key={user._id}><Row className="container mt-2">
-        <Col md={3} ><img src="/static/img/avadefault.png" style={{width:30,borderRadius:50}}/></Col>
+        <Col md={3} ><img src={user.avatar_url!==null?user.avatar_url:`/static/img/avadefault.png`} style={{width:30,borderRadius:50}}/></Col>
         <Col md={9} style={{color:'black',textAlign:'left',cursor:'pointer'}}><a href={`/profile?${user._id}`} style={{color:'black'}}>{user.name}</a></Col>
       </Row></div>
         ))}

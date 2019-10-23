@@ -6,6 +6,7 @@
     border-radius: 5px;
     height: 100%;
     cursor: pointer;
+    background-size: cover;
 }
 .text-edit{
     text-align: center;

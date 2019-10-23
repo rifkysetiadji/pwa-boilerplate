@@ -49,14 +49,17 @@ class index extends Component {
             )
           }else{
               if(this.props.thread.timeline!==null){
-                  let thread=this.props.thread.timeline.map(res=>{
+                console.log('this.props.thread.timeline', this.props.thread.timeline)
+                  let timeline=this.props.thread.timeline
+                  let thread=timeline.map(res=>{
+                    
                       return(
                           <div>
                     <Card >
                 <CardHeader
                     avatar={
                     <Avatar aria-label="recipe" >
-                        R
+                        <img src={res.user_id.avatar_url!==null?res.user_id.avatar_url:'/static/img/avadefault.png'} style={{width:'100%'}}/>
                     </Avatar>
                     }
                     action={

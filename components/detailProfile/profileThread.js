@@ -31,6 +31,7 @@ class profileThread extends Component {
             [id]: !this.state[id]
           });
       }
+      
       renderThreads=()=>{
           if(this.props.thread.threads!==null){
             let threads=this.props.thread.threads.map(thread=>(
@@ -39,7 +40,8 @@ class profileThread extends Component {
                 <CardHeader
                     avatar={
                     <Avatar aria-label="recipe" >
-                        R
+                        
+                        <img src={this.props.auth.profile.avatar_url!==null?this.props.auth.profile.avatar_url:'/static/img/avadefault.png'} style={{width:'100%'}}/>
                     </Avatar>
                     }
                     action={

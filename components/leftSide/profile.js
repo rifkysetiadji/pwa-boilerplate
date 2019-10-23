@@ -22,12 +22,12 @@ class profile extends Component {
 
     }
     showFollowers=async()=>{
-        this.props.getFollower(this.props.token.token)
+        this.props.getFollower(this.props.token.token,this.props.auth.profile.id)
         this.setState({showFollowers:!this.state.showFollowers})
         
     }
     showFollowing=()=>{
-        this.props.getFollowing(this.props.token.token)
+        this.props.getFollowing(this.props.token.token,this.props.auth.profile.id)
         this.setState({showFollowing:!this.state.showFollowing})
     }
     render() {
@@ -44,6 +44,7 @@ class profile extends Component {
             )
         }else{
             let profile=this.props.auth.profile
+            // console.log('profile', profile)
             return (
                 <div>
                     

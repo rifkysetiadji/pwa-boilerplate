@@ -232,3 +232,45 @@ export const unFollow=(token,followingId)=>{
     }
 }
 
+export const uploadAva=(token,img_url)=>{
+    return async(dispatch)=>{
+        dispatch(setLoading(true,'getProfileLoading'))
+        
+        fetch('/api/auth/update-ava', {
+            method: 'POST',
+            headers:{
+                'Authorization': 'Bearer ' + token,
+            },
+            body: img_url,
+        })
+            .then(response => response.json())
+            .then(success => {
+                window.location.reload()
+            })
+            .catch(error => console.log(error)
+        );
+    }
+}
+
+export const updateProfile=(token,data)=>{
+    return async(dispatch)=>{
+        dispatch(setLoading(true,'getProfileLoading'))
+        let dataReq={
+            url:`/auth/update-profile`,
+            method:'PUT',
+            data:{
+                data,
+                headers:{
+                    'Authorization': 'Bearer ' + token,
+                }
+            }
+        }
+        let res=await dispatch(apiCall(dataReq))
+        if(get(res,'status')==201){
+            window.location.reload()
+        }else{
+            alert('oopss,found touble here')
+            dispatch(setLoading(false,'getProfileLoading'))
+        }
+    }
+}
